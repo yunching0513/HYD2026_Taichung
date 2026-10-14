@@ -12,11 +12,12 @@ Live site (GitHub Pages): https://yunching0513.github.io/HYD2026_Taichung/
 
 The interface is English-first, with Chinese as the secondary language: map labels, legend and side panels are in English, and village, district, zone, project and road names carry their Chinese names. The village search accepts English or Chinese.
 
-- The 8 districts and 214 villages of the former Taichung City on an English-labelled basemap (OpenStreetMap data); the 5 old-downtown districts (Central, East, South, West, North) carry a darker tint and a merged outline, Xitun, Nantun and Beitun a lighter one
-- Two styles and three tones from the switches in the header, remembered in the browser and shared with the landing page:
+- The 8 districts and 214 villages of the former Taichung City on an English-labelled basemap (OpenStreetMap data); the 5 old-downtown districts (Central, East, South, West, North) carry a merged outline. In the Kids style every district has its own soft colour; in Deck and Program the old downtown carries a darker tint, Xitun, Nantun and Beitun a lighter one
+- Three styles and three tones from the switches in the header, remembered in the browser and shared with the landing page:
+  - **Kids** (the default): a child-friendly look after the Kodomo Hon no Mori (こども本の森) design guidelines: the rounded Huninn (粉圓) and Varela Round typefaces, warm ink on paper, a forest-green accent with cherry, sunshine and sky dots, pill buttons, rounded cards and gentle fade-in motion (switched off under reduced motion). Each district takes one colour (Central forest, East cocoa, South sky, West sunshine, North lavender, Xitun cherry, Nantun coral, Beitun apricot), assigned so that districts sharing a border stay distinguishable for red–green colour-blind readers (OKLab ΔE ≥ 8 under protan and deutan simulation); district lines and labels name each one too. Over the basemap the overlay is multiplied (screen in Dark), so basemap streets and labels show through the colours. Freeways are apricot, the MRT Green Line green, and the land-use bars take the plan overlay's zone colours
   - **Deck**: the monochrome look of the HYD Healthy City Workshop deck (Instrument Serif, warm greys, 2px ink rules)
   - **Program**: after the HYD Taichung program page (Bricolage Grotesque and IBM Plex, navy ink on cool grey, sun-yellow highlights for the old downtown, project markers and charts, rounded cards)
-  - **Light**, **White** or **Dark** for either style; until one is chosen, light or dark follows the system setting
+  - **Light**, **White** or **Dark** for any style; until one is chosen, light or dark follows the system setting
 - Pan by dragging, zoom with the wheel or a pinch; arrow keys pan, `+` / `-` zoom, `0` shows the full extent
 - Hover a village for its name and area; click or search to see its area, share of the district, area rank and village code
 - Road network from OpenStreetMap, with English and Chinese road names along the arterials
@@ -95,7 +96,7 @@ Standard OSM raster tiles have their labels baked in, in the local language, so 
 - Fallback: if MapLibre or the style cannot load (no WebGL, blocked network), the map uses the standard OSM tiles (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`, labels in Chinese) and says so under the layer toggles; if those fail too, it shows no basemap
 - Credits on the map: "OpenFreeMap © OpenMapTiles · data © OpenStreetMap contributors" (or the OSM credit when the fallback is in use). Do not remove them.
 - The fallback tiles follow the [OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/): ordinary browsing only, no bulk downloading or prefetching.
-- **Actions → Check basemap → Run workflow** opens the map in headless Chromium, checks that the vector basemap starts, lines up with the overlay and labels in English, and attaches screenshots of the three themes (`scripts/check_basemap.mjs`).
+- **Actions → Check basemap → Run workflow** opens the map in headless Chromium, checks that the vector basemap starts, lines up with the overlay and labels in English, and attaches screenshots of the three tones in the Kids style plus Deck and Program in Light (`scripts/check_basemap.mjs`).
 - Opened from `file://`, browsers may refuse to load tiles. Preview locally with:
 
   ```sh
@@ -182,11 +183,12 @@ data/derived/             fitted plan trace, OSM roads and landmarks, project lo
 
 **原臺中市基本圖（`map/index.html`）**：介面以英文為主、中文為輔，里名、區名、分區、建設與路名都附上中文，搜尋可輸入英文或中文里名。
 
-- 原臺中市8區、214里的界線，疊在OpenStreetMap底圖上；舊市區5區（中、東、南、西、北區）用較深的底色並加上合併外框，西屯、南屯、北屯用較淺的底色
-- 頁首可切換兩種風格與三種色調，選擇會記在瀏覽器中，並與成果首頁同步：
+- 原臺中市8區、214里的界線，疊在OpenStreetMap底圖上；舊市區5區（中、東、南、西、北區）加上合併外框。**Kids**童趣風下每一區各有一種柔和的顏色；Deck與Program風格則是舊市區用較深的底色，西屯、南屯、北屯用較淺的底色
+- 頁首可切換三種風格與三種色調，選擇會記在瀏覽器中，並與成果首頁同步：
+  - **Kids**童趣風（預設）：參考こども本の森設計準則的兒童友善風格，使用圓潤的粉圓（Huninn）與Varela Round字體、紙色底配暖墨色、森林綠主色搭配櫻桃粉、陽光黃、晴空藍點綴，膠囊按鈕、圓角卡片與輕柔的淡入動效（裝置設定減少動態時關閉）。8區各有一色（中區森林綠、東區可可、南區晴空藍、西區陽光黃、北區薰衣草、西屯櫻桃粉、南屯珊瑚、北屯杏桃），相鄰的區在紅綠色盲模擬下仍可分辨（OKLab ΔE ≥ 8），區界線與區名也標示各區。疊在底圖上時以色彩相乘（深色模式為濾色）混合，底圖的街道與標註仍看得見。快速道路為杏桃色、捷運綠線為綠色，土地使用長條圖沿用細部計畫疊圖的分區顏色
   - **Deck**簡報風：HYD健康城市工作坊簡報的黑白灰風格（Instrument Serif、暖灰、2px墨線）
   - **Program**議程風：參考HYD臺中議程頁（Bricolage Grotesque與IBM Plex字體、深藍字配冷灰底、圓角卡片），舊市區、重大建設標記與圖表改用黃色重點色
-  - 兩種風格都有**Light**淺色、**White**白色、**Dark**深色；尚未選擇時依裝置設定顯示淺色或深色
+  - 三種風格都有**Light**淺色、**White**白色、**Dark**深色；尚未選擇時依裝置設定顯示淺色或深色
 - 拖曳平移、滾輪或雙指縮放；方向鍵平移、`+`／`-`縮放、`0`回到全圖
 - 滑過里顯示名稱與面積；點選或搜尋里名可查看面積、占行政區比例、面積排序與村里代碼
 - OSM路網，主要道路沿線標示英文與中文路名
@@ -222,7 +224,7 @@ OSM標準圖磚的文字是伺服器預先畫好的，只會顯示當地語言�
 - 所有名稱標註改用OSM的`name:en`；沒有英文名稱的地物維持原本的中文。目前範圍內約94%的主要與次要道路有英文名，巷道約一半。
 - 若MapLibre或樣式無法載入（例如瀏覽器不支援WebGL、網路被擋），會自動退回OSM標準圖磚（中文標註），並在圖層開關下方說明；兩者都失敗時不顯示底圖。
 - 圖上的「OpenFreeMap © OpenMapTiles · data © OpenStreetMap contributors」出處請勿移除。退回OSM圖磚時，依[OSM圖磚使用政策](https://operations.osmfoundation.org/policies/tiles/)不可大量下載。
-- **Actions → Check basemap → Run workflow**會用無頭瀏覽器開啟地圖，檢查向量底圖是否載入、是否對齊、標註是否為英文，並附上三種主題的截圖。
+- **Actions → Check basemap → Run workflow**會用無頭瀏覽器開啟地圖，檢查向量底圖是否載入、是否對齊、標註是否為英文，並附上Kids童趣風三種色調，以及Deck、Program淺色的截圖。
 - 以`file://`直接開啟時可能載不到圖磚，本機預覽請用`python3 -m http.server 8000`。要更換來源，修改`templates/basemap.html`的`VECTOR_STYLE`或`TILE_URL`並更新出處標示。
 
 ### 發布到GitHub Pages
