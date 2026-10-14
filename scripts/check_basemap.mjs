@@ -3,7 +3,7 @@
 // Loads the page in headless Chromium with network access, waits for the OpenFreeMap vector basemap,
 // then reports: which basemap is up (vector or the raster fallback), how far the basemap sits from the
 // svg overlay at a known point, and which labels are drawn in English or fall back to the local name.
-// Screenshots of the three themes go to check-basemap/.
+// Screenshots go to check-basemap/: the three tones of the default Kids style, and Deck and Program in Light.
 //
 // Usage: node scripts/check_basemap.mjs http://localhost:8000/map/index.html
 // Exits non-zero if the vector basemap does not start or is misaligned by more than 2 px.
@@ -92,6 +92,12 @@ for (const [name, act] of [
     await page.click(`[data-theme-set="${theme}"]`);
     await page.waitForTimeout(200);
     await page.screenshot({ path: `${OUT}/${name}-${theme}.png` });
+  }
+  await page.click('[data-theme-set="light"]');
+  for (const style of ["deck", "program", "kids"]) {
+    await page.click(`[data-style-set="${style}"]`);
+    await page.waitForTimeout(900); // the kids style fades its panels in
+    if (style !== "kids") await page.screenshot({ path: `${OUT}/${name}-${style}-light.png` });
   }
 }
 

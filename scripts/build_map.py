@@ -264,11 +264,15 @@ def thumbnail_svg(data, width=560, pad=6):
                 out.append("".join(cmds) + "Z")
         return "".join(out)
 
-    # d0 = old downtown, d1 = the outer districts, as on the map
+    # d0 = old downtown, d1 = the outer districts, as on the map; --k names the district's colour token,
+    # which only the kids style defines (the other styles fall back to the d0 / d1 tints)
     group = {f["properties"]["district_code"]: 0 if f["properties"].get("old_downtown") else 1
              for f in data["districts"]["features"]}
-    parts = [f'<path class="v d{group[f["properties"]["district_code"]]}" d="{path(f["geometry"])}"/>'
-             for f in data["villages"]["features"] if f["geometry"]]
+    colour = {f["properties"]["district_code"]: re.sub(r"[^a-z]+", "-", re.sub(r"\s*District$", "", f["properties"]["district_en"].strip(), flags=re.I).lower())
+              for f in data["districts"]["features"]}
+    parts = [f'<path class="v d{group[code]}" style="--k:var(--k-{colour[code]})" d="{path(f["geometry"])}"/>'
+             for f in data["villages"]["features"] if f["geometry"]
+             for code in [f["properties"]["district_code"]]]
     outline = {"type": "Polygon", "coordinates": data["old_downtown_outline"]}
     parts.append(f'<path class="old" d="{path(outline)}"/>')
     parts += [f'<path class="dist" d="{path(f["geometry"])}"/>' for f in data["districts"]["features"]]
@@ -297,7 +301,7 @@ def landing_values(data):
         size_kb = path.stat().st_size / 1024
         rows.append(
             f'<tr><td class="file"><a href="{rel}" download>{html.escape(path.name)}</a>'
-            f'<span class="fmt">{path.suffix[1:].upper()}</span></td>'
+            f'<span class="fmt fmt-{path.suffix[1:].lower()}">{path.suffix[1:].upper()}</span></td>'
             f'<td>{html.escape(en)}<span class="zh block" lang="zh-Hant-TW">{html.escape(zh)}</span></td>'
             f'<td class="size num">{size_kb:.1f} KB</td></tr>'
         )
