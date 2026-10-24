@@ -1,17 +1,22 @@
 <title>Taichung Base Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Huninn&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;600&family=Varela+Round&display=swap">
 <style>
 /* Layout: a survey-sheet map inside a hairline neatline with coordinate ticks in the margin (left),
    a reference column of legend, lookup and plan figures (right); stacks to one column under 960px.
    Palette and type follow the HYD Healthy City Workshop deck: warm greys on #f4f4f2 with ink #1c1c1c,
    2px ink rules between blocks, Instrument Serif / Instrument Sans / JetBrains Mono, Noto TC for Chinese.
    Two header switches set attributes on <html>:
-     data-style = (none, the deck) | "program": after the HYD Taichung program page, with navy ink on cool grey,
-                  sun-yellow highlights, Bricolage Grotesque / IBM Plex and rounded cards;
+     data-style = "kids" (the default): after the Kodomo Hon no Mori (こども本の森) design guidelines, with warm ink
+                  on paper, a forest-green accent, a soft colour per district, Huninn / Varela Round, pills and
+                  rounded cards;
+                  "deck" (the base rules below) | "program": after the HYD Taichung program page, with navy ink on
+                  cool grey, sun-yellow highlights, Bricolage Grotesque / IBM Plex and rounded cards;
      data-theme = "light" | "white" | "dark"; without it, light or dark follows the system setting.
-   Each style defines its colours for all three tones; components read only the tokens below. */
+   Each style defines its colours for all three tones; components read only the tokens below.
+   District colours: each village path carries --k: var(--k-<district>); only the kids style defines the --k-*
+   tokens, so elsewhere --k is invalid and the var() fallbacks give the old-downtown / outer-district tints. */
 :root {
   --bg: #f4f4f2;
   --surface: #f4f4f2;
@@ -54,6 +59,16 @@
   --r-md: 2px;
   --rule-strong: 2px solid var(--ink);
   --dist-char: 8.5; /* approx px per character of a district label, for label collision */
+  --neat: var(--line-admin);
+  --tile-blend: normal; /* how the svg overlay meets the basemap tiles */
+  --tip-border: 0 solid transparent;
+  /* road network: one colour per class */
+  --road-mw: var(--ink);
+  --road-major: var(--ink);
+  --road-sec: var(--ink-2);
+  --road-minor: var(--muted);
+  --road-rail: var(--ink);
+  --road-metro: var(--ink);
 
   --font-display: "Instrument Serif", "Noto Serif TC", "Songti TC", "PMingLiU", Georgia, serif;
   --font-body: "Instrument Sans", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
@@ -266,6 +281,185 @@
   --old-band: color-mix(in srgb, #f5c02a 60%, transparent);
   color-scheme: dark;
 }
+/* kids style (after the Kodomo Hon no Mori design guidelines); after the deck's and program's rules so it wins ties */
+:root[data-style="kids"] {
+  --bg: #f6f2e9;
+  --surface: #ffffff;
+  --field: #ffffff;
+  --ground: #f6f2ea;
+  --ink: #56533f;
+  --ink-2: #6e6a55;
+  --muted: #716d59;
+  --rule: #ece7dc;
+  --line-vil: #ffffff;
+  --line-admin: #56533f;
+  --accent: #3f7a4b;
+  --accent-ink: #ffffff;
+  --tip-bg: #ffffff;
+  --tip-ink: #56533f;
+  --tip-muted: #716d59;
+  --tip-border: 1.5px solid #ece7dc;
+  --d0-fill: #f1e6c8;
+  --d0-hot: #e9d9ae;
+  --d1-fill: #ffffff;
+  --d1-hot: #f6f2ea;
+  /* villages take their district's colour in full; over the tiles the svg multiplies, so basemap labels show through */
+  --d0-wash: 1;
+  --d0-wash-hot: 1;
+  --d1-wash: 1;
+  --d1-wash-hot: 1;
+  --tile-filter: saturate(1.4) brightness(1.02);
+  --tile-blend: multiply;
+  --neutral-fill: #c7c3b2;
+  --shadow: 0 10px 28px rgba(86, 83, 63, 0.18);
+  --hl: #3f7a4b;
+  --on-hl: #ffffff;
+  --hl-text: #3f7a4b;
+  --leaf: #62a968;
+  --d0-wash-fill: var(--d0-fill);
+  --old-band: color-mix(in srgb, #3f7a4b 50%, transparent);
+  --neat: #c7c3b2;
+  --pin-halo: #ffffff;
+  --pin-halo-w: 3px;
+  --pin-shadow: drop-shadow(0 2px 3px rgba(86, 83, 63, 0.35));
+  --road-mw: #d9822b;
+  --road-major: #56533f;
+  --road-sec: #716d59;
+  --road-minor: #a9a491;
+  --road-rail: #6e6a55;
+  --road-metro: #3f7a4b;
+  /* one soft colour per district (forest, cocoa, sky, sunshine, lavender, cherry, coral, apricot), assigned so that
+     districts sharing a border stay apart under protan / deutan simulation (OKLab dE >= 8) */
+  --k-central: #b8d8bb;
+  --k-east: #c4a488;
+  --k-south: #87b7cc;
+  --k-west: #ecdb6e;
+  --k-north: #b6a8dc;
+  --k-xitun: #f1c3d2;
+  --k-nantun: #e99285;
+  --k-beitun: #f2b37a;
+  color-scheme: light;
+  --r-sm: 14px;
+  --r-md: 20px;
+  --rule-strong: 1px solid var(--rule);
+  --dist-char: 10.5;
+  --font-display: "Huninn", "Varela Round", "Noto Sans TC", system-ui, sans-serif;
+  --font-body: "Huninn", "Varela Round", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-zh: "Huninn", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: "Varela Round", "Huninn", ui-rounded, system-ui, sans-serif;
+}
+:root[data-style="kids"][data-theme="white"] {
+  --bg: #ffffff;
+  --ground: #faf8f3;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-style="kids"]:not([data-theme="light"]):not([data-theme="white"]) {
+    --bg: #1e221e;
+    --surface: #262b26;
+    --field: #2d332d;
+    --ground: #232823;
+    --ink: #f3efe4;
+    --ink-2: #d8d3c4;
+    --muted: #aba693;
+    --rule: #3a4139;
+    --line-vil: #232823;
+    --line-admin: #f3efe4;
+    --accent: #7fbe7a;
+    --accent-ink: #1e221e;
+    --tip-bg: #2d332d;
+    --tip-ink: #f3efe4;
+    --tip-muted: #aba693;
+    --tip-border: 1.5px solid #3a4139;
+    --d0-fill: #4a4630;
+    --d0-hot: #5a553a;
+    --d1-fill: #2d332d;
+    --d1-hot: #363d36;
+    --d0-wash: 1;
+    --d0-wash-hot: 1;
+    --d1-wash: 1;
+    --d1-wash-hot: 1;
+    --tile-filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.92) saturate(1.3);
+    --tile-blend: screen;
+    --neutral-fill: #5a5f55;
+    --shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+    --hl: #7fbe7a;
+    --on-hl: #1e221e;
+    --hl-text: #9bc97e;
+    --leaf: #7fbe7a;
+    --old-band: color-mix(in srgb, #9bc97e 50%, transparent);
+    --neat: #4a5249;
+    --pin-halo: #1e221e;
+    --pin-shadow: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+    --road-mw: #f0a65e;
+    --road-major: #f3efe4;
+    --road-sec: #aba693;
+    --road-minor: #6e7366;
+    --road-rail: #d8d3c4;
+    --road-metro: #7fbe7a;
+    --k-central: #51734f;
+    --k-east: #a78564;
+    --k-south: #7c9fab;
+    --k-west: #c3b139;
+    --k-north: #9186b6;
+    --k-xitun: #86616a;
+    --k-nantun: #c57061;
+    --k-beitun: #cb8f53;
+    color-scheme: dark;
+  }
+}
+:root[data-style="kids"][data-theme="dark"] {
+  --bg: #1e221e;
+  --surface: #262b26;
+  --field: #2d332d;
+  --ground: #232823;
+  --ink: #f3efe4;
+  --ink-2: #d8d3c4;
+  --muted: #aba693;
+  --rule: #3a4139;
+  --line-vil: #232823;
+  --line-admin: #f3efe4;
+  --accent: #7fbe7a;
+  --accent-ink: #1e221e;
+  --tip-bg: #2d332d;
+  --tip-ink: #f3efe4;
+  --tip-muted: #aba693;
+  --tip-border: 1.5px solid #3a4139;
+  --d0-fill: #4a4630;
+  --d0-hot: #5a553a;
+  --d1-fill: #2d332d;
+  --d1-hot: #363d36;
+  --d0-wash: 1;
+  --d0-wash-hot: 1;
+  --d1-wash: 1;
+  --d1-wash-hot: 1;
+  --tile-filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.92) saturate(1.3);
+  --tile-blend: screen;
+  --neutral-fill: #5a5f55;
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  --hl: #7fbe7a;
+  --on-hl: #1e221e;
+  --hl-text: #9bc97e;
+  --leaf: #7fbe7a;
+  --old-band: color-mix(in srgb, #9bc97e 50%, transparent);
+  --neat: #4a5249;
+  --pin-halo: #1e221e;
+  --pin-shadow: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+  --road-mw: #f0a65e;
+  --road-major: #f3efe4;
+  --road-sec: #aba693;
+  --road-minor: #6e7366;
+  --road-rail: #d8d3c4;
+  --road-metro: #7fbe7a;
+  --k-central: #51734f;
+  --k-east: #a78564;
+  --k-south: #7c9fab;
+  --k-west: #c3b139;
+  --k-north: #9186b6;
+  --k-xitun: #86616a;
+  --k-nantun: #c57061;
+  --k-beitun: #cb8f53;
+  color-scheme: dark;
+}
 
 html, body { height: 100%; }
 body {
@@ -391,7 +585,7 @@ h1 .zh { margin-left: 0.5em; font-family: "Noto Serif TC", "Songti TC", serif; f
 #map.dragging { cursor: grabbing; }
 #map:focus-visible { outline: 2px solid var(--hl); outline-offset: -3px; }
 .ground { fill: var(--ground); }
-.neatline { fill: none; stroke: var(--line-admin); stroke-width: 1; }
+.neatline { fill: none; stroke: var(--neat); stroke-width: 1; }
 
 .vil {
   stroke: var(--line-vil);
@@ -402,10 +596,11 @@ h1 .zh { margin-left: 0.5em; font-family: "Noto Serif TC", "Songti TC", serif; f
 }
 .vil { fill-rule: evenodd; }
 .vil.approx { stroke: var(--ink-2); stroke-dasharray: 3 2; }
-.vil.d0 { fill: var(--d0-fill); }
-.vil.d1 { fill: var(--d1-fill); }
-.vil.d0.is-hot, .vil.d0.is-sel { fill: var(--d0-hot); }
-.vil.d1.is-hot, .vil.d1.is-sel { fill: var(--d1-hot); }
+.vil { --k-hot: color-mix(in srgb, var(--k) 80%, var(--ink)); }
+.vil.d0 { fill: var(--k, var(--d0-fill)); }
+.vil.d1 { fill: var(--k, var(--d1-fill)); }
+.vil.d0.is-hot, .vil.d0.is-sel { fill: var(--k-hot, var(--d0-hot)); }
+.vil.d1.is-hot, .vil.d1.is-sel { fill: var(--k-hot, var(--d1-hot)); }
 #map.no-fill .vil { fill: var(--surface); }
 #map.no-fill .vil.is-hot, #map.no-fill .vil.is-sel { fill: color-mix(in srgb, var(--ink) 8%, var(--surface)); }
 #map.no-vline .vil { stroke: none; }
@@ -433,11 +628,12 @@ h1 .zh { margin-left: 0.5em; font-family: "Noto Serif TC", "Songti TC", serif; f
   filter: var(--tile-filter);
 }
 .vbase > div { width: 100%; height: 100%; }
+#map.has-tiles { mix-blend-mode: var(--tile-blend); }
 #map.has-tiles .ground { fill: none; }
-#map.has-tiles .vil.d0 { fill: var(--d0-wash-fill); fill-opacity: var(--d0-wash); }
-#map.has-tiles .vil.d1 { fill: var(--ink); fill-opacity: var(--d1-wash); }
-#map.has-tiles .vil.d0.is-hot, #map.has-tiles .vil.d0.is-sel { fill-opacity: var(--d0-wash-hot); }
-#map.has-tiles .vil.d1.is-hot, #map.has-tiles .vil.d1.is-sel { fill-opacity: var(--d1-wash-hot); }
+#map.has-tiles .vil.d0 { fill: var(--k, var(--d0-wash-fill)); fill-opacity: var(--d0-wash); }
+#map.has-tiles .vil.d1 { fill: var(--k, var(--ink)); fill-opacity: var(--d1-wash); }
+#map.has-tiles .vil.d0.is-hot, #map.has-tiles .vil.d0.is-sel { fill: var(--k-hot, var(--d0-wash-fill)); fill-opacity: var(--d0-wash-hot); }
+#map.has-tiles .vil.d1.is-hot, #map.has-tiles .vil.d1.is-sel { fill: var(--k-hot, var(--ink)); fill-opacity: var(--d1-wash-hot); }
 #map.has-tiles.no-fill .vil { fill-opacity: 0; }
 #map.has-tiles.no-fill .vil.is-hot, #map.has-tiles.no-fill .vil.is-sel { fill: var(--ink); fill-opacity: 0.1; }
 
@@ -485,7 +681,7 @@ h1 .zh { margin-left: 0.5em; font-family: "Noto Serif TC", "Songti TC", serif; f
 .dlabel .l1 { font: italic 400 21px var(--font-display); letter-spacing: -0.2px; fill: var(--ink); }
 .dlabel .l2 { font: 500 11.5px "Noto Serif TC", "Songti TC", serif; letter-spacing: 0.3em; fill: var(--ink-2); }
 
-.tick { stroke: var(--line-admin); stroke-width: 1; }
+.tick { stroke: var(--neat); stroke-width: 1; }
 .ticklabel {
   font: 10px var(--font-mono);
   fill: var(--muted);
@@ -562,6 +758,7 @@ h1 .zh { margin-left: 0.5em; font-family: "Noto Serif TC", "Songti TC", serif; f
   padding: 7px 10px;
   background: var(--tip-bg);
   color: var(--tip-ink);
+  border: var(--tip-border);
   border-radius: var(--r-sm);
   box-shadow: var(--shadow);
   font-size: var(--fs-sm);
@@ -616,8 +813,8 @@ h2 .zh.block { margin-top: 3px; }
   height: 16px;
   border: 1.5px solid var(--line-admin);
 }
-.swatch.d0 { background: var(--d0-fill); }
-.swatch.d1 { background: var(--d1-fill); }
+.swatch.d0 { background: var(--k, var(--d0-fill)); }
+.swatch.d1 { background: var(--k, var(--d1-fill)); }
 .legend-lines {
   display: flex;
   flex-wrap: wrap;
@@ -760,18 +957,18 @@ h2 .zh.block { margin-top: 3px; }
 .sources { margin: 0; padding-left: 1.1em; font-size: var(--fs-xs); color: var(--ink-2); display: grid; gap: 6px; }
 .sources a { color: inherit; text-underline-offset: 2px; }
 
-/* road network (OSM): one path per class, ink weights by hierarchy */
+/* road network (OSM): one path per class, weights by hierarchy, colours from the --road-* tokens */
 .road { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
-.road.motorway { stroke: var(--ink); stroke-width: 4; }
+.road.motorway { stroke: var(--road-mw); stroke-width: 4; }
 .road.motorway-in { stroke: var(--surface); stroke-width: 1.6; }
-.road.trunk { stroke: var(--ink); stroke-width: 3; }
-.road.primary { stroke: var(--ink); stroke-width: 2.2; }
-.road.secondary { stroke: var(--ink-2); stroke-width: 1.5; }
-.road.tertiary { stroke: var(--ink-2); stroke-width: 1; }
-.road.link { stroke: var(--ink-2); stroke-width: 1; }
-.road.minor { stroke: var(--muted); stroke-width: 0.6; }
-.road.rail { stroke: var(--ink); stroke-width: 1.3; stroke-dasharray: 7 3; stroke-linecap: butt; }
-.road.metro { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 2 3; stroke-linecap: butt; }
+.road.trunk { stroke: var(--road-mw); stroke-width: 3; }
+.road.primary { stroke: var(--road-major); stroke-width: 2.2; }
+.road.secondary { stroke: var(--road-sec); stroke-width: 1.5; }
+.road.tertiary { stroke: var(--road-sec); stroke-width: 1; }
+.road.link { stroke: var(--road-sec); stroke-width: 1; }
+.road.minor { stroke: var(--road-minor); stroke-width: 0.6; }
+.road.rail { stroke: var(--road-rail); stroke-width: 1.3; stroke-dasharray: 7 3; stroke-linecap: butt; }
+.road.metro { stroke: var(--road-metro); stroke-width: 2; stroke-dasharray: 2 3; stroke-linecap: butt; }
 #map:not(.zoom-detail) .road.minor { display: none; }
 #map.has-tiles .road { stroke-opacity: 0.85; }
 .road-label {
@@ -786,12 +983,12 @@ h2 .zh.block { margin-top: 3px; }
 }
 .road-label .zh { font-family: var(--font-zh); font-weight: 400; fill: var(--muted); }
 .line-key.road-k { border-top-width: 2px; }
-.line-key.road-motorway { border-top: 4px double var(--ink); height: 4px; }
-.line-key.road-primary { border-top: 2px solid var(--ink); }
-.line-key.road-secondary { border-top: 1.5px solid var(--ink-2); }
-.line-key.road-minor { border-top: 1px solid var(--muted); }
-.line-key.road-metro { border-top: 2px dotted var(--ink); }
-.line-key.road-rail { border-top: 2px dashed var(--ink); }
+.line-key.road-motorway { border-top: 4px double var(--road-mw); height: 4px; }
+.line-key.road-primary { border-top: 2px solid var(--road-major); }
+.line-key.road-secondary { border-top: 1.5px solid var(--road-sec); }
+.line-key.road-minor { border-top: 1px solid var(--road-minor); }
+.line-key.road-metro { border-top: 2px dotted var(--road-metro); }
+.line-key.road-rail { border-top: 2px dashed var(--road-rail); }
 
 /* major projects: numbered markers, dashed footprint on hover / selection */
 .proj-hit { fill: transparent; cursor: pointer; }
@@ -895,27 +1092,118 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
 :root[data-style="program"] .map-ctrl button { background: var(--surface); box-shadow: 0 1px 2px rgba(22, 24, 42, 0.14); }
 :root[data-style="program"] .swatch { border-radius: 3px; }
 
+/* ---------- kids style: rounded type, pills, cards, a few floating dots ---------- */
+/* Huninn has one weight, so headings get their weight from a matching stroke, as in the guidelines */
+.deco { display: none; }
+:root[data-style="kids"] h1, :root[data-style="kids"] h2, :root[data-style="kids"] h3 { font-weight: 400; }
+:root[data-style="kids"] h1 { font-size: 30px; letter-spacing: 0.01em; -webkit-text-stroke: 0.9px currentColor; }
+:root[data-style="kids"] h1 i { font-style: normal; color: var(--hl-text); }
+:root[data-style="kids"] h1 .zh { font-family: var(--font-zh); font-size: 0.5em; letter-spacing: 0.08em; -webkit-text-stroke: 0; }
+:root[data-style="kids"] h2 { font-size: 21px; letter-spacing: 0.01em; -webkit-text-stroke: 0.6px currentColor; }
+:root[data-style="kids"] h2 .zh { -webkit-text-stroke: 0; }
+:root[data-style="kids"] h2::before {
+  content: "";
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--dot, var(--leaf));
+  vertical-align: 0.08em;
+}
+:root[data-style="kids"] .aside section:nth-of-type(6n + 2) { --dot: #e89ab0; }
+:root[data-style="kids"] .aside section:nth-of-type(6n + 3) { --dot: #e6cf3e; }
+:root[data-style="kids"] .aside section:nth-of-type(6n + 4) { --dot: #8fb9c9; }
+:root[data-style="kids"] .aside section:nth-of-type(6n + 5) { --dot: #f2b37a; }
+:root[data-style="kids"] .aside section:nth-of-type(6n + 6) { --dot: #b6a8dc; }
+:root[data-style="kids"] .sel-head h3 { font-size: 22px; -webkit-text-stroke: 0.5px currentColor; }
+:root[data-style="kids"] .p-head h3 { -webkit-text-stroke: 0.35px currentColor; }
+:root[data-style="kids"] .deco { display: inline-flex; align-items: flex-start; gap: 6px; margin-left: 14px; vertical-align: 0.1em; }
+:root[data-style="kids"] .deco i { display: block; border-radius: 50%; animation: floatLeaf 7s ease-in-out infinite; }
+:root[data-style="kids"] .deco i:nth-child(1) { width: 18px; height: 18px; background: var(--leaf); opacity: 0.45; }
+:root[data-style="kids"] .deco i:nth-child(2) { width: 12px; height: 12px; margin-top: 10px; background: #e89ab0; opacity: 0.75; animation-duration: 6s; animation-delay: 0.8s; }
+:root[data-style="kids"] .deco i:nth-child(3) { width: 9px; height: 9px; margin-top: 2px; background: #e6cf3e; opacity: 0.9; animation-duration: 8s; animation-delay: 0.3s; }
+:root[data-style="kids"] .eyebrow { letter-spacing: 0.2em; color: var(--hl-text); }
+:root[data-style="kids"] .eyebrow::before { content: ""; display: inline-block; width: 26px; height: 2px; margin-right: 10px; border-radius: 2px; background: var(--leaf); vertical-align: 0.3em; }
+:root[data-style="kids"] .facts { padding: 3px 12px; background: var(--ground); border-radius: 999px; }
+:root[data-style="kids"] .theme-switch { border-width: 1.5px; border-radius: 999px; }
+:root[data-style="kids"] .theme-switch button { padding: 5px 12px; font-size: 11px; letter-spacing: 0.08em; }
+:root[data-style="kids"] .theme-switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+:root[data-style="kids"] .mapframe { box-shadow: 0 6px 24px rgba(86, 83, 63, 0.08); }
+:root[data-style="kids"] .aside section {
+  margin-bottom: 14px;
+  padding: 18px 20px 20px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+}
+:root[data-style="kids"] .legend-dist { padding: 7px 10px; background: var(--surface); border-width: 1.5px; }
+:root[data-style="kids"] .swatch { border-radius: 6px; border-color: color-mix(in srgb, var(--ink) 45%, transparent); }
+:root[data-style="kids"] .search input { padding: 9px 14px; border-width: 1.5px; }
+:root[data-style="kids"] .search input:focus { border-color: var(--leaf); outline: none; }
+:root[data-style="kids"] .search button { padding: 9px 18px; border-radius: 999px; }
+:root[data-style="kids"] .btn-s, :root[data-style="kids"] .sel-head .clear { border-width: 1.5px; border-radius: 999px; background: var(--surface); }
+:root[data-style="kids"] .btn-s { padding: 6px 14px; }
+:root[data-style="kids"] .map-ctrl button { width: 36px; height: 36px; border-width: 1.5px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); }
+:root[data-style="kids"] .map-ctrl button:hover { border-color: var(--leaf); color: var(--hl-text); }
+:root[data-style="kids"] .coord, :root[data-style="kids"] .attrib { border-radius: 8px; }
+:root[data-style="kids"] .chip { border: 0; background: var(--ground); font-family: var(--font-body); letter-spacing: 0.06em; }
+:root[data-style="kids"] .chip.open { background: color-mix(in srgb, var(--leaf) 18%, var(--surface)); color: var(--hl-text); }
+:root[data-style="kids"] .chip.pending { background: color-mix(in srgb, #e6cf3e 30%, var(--surface)); color: var(--ink); }
+:root[data-style="kids"] .chip.pending::before { background: #e6cf3e; border: 0; }
+:root[data-style="kids"] .pnum { width: 22px; height: 22px; font-size: 11px; }
+:root[data-style="kids"] .projects li.is-sel { outline: 2px solid var(--leaf); outline-offset: 6px; border-radius: 12px; }
+:root[data-style="kids"] .proj-num { font-size: 11px; }
+:root[data-style="kids"] .split .zones { border-radius: 999px 0 0 999px; }
+:root[data-style="kids"] .split .pub { border-radius: 0 999px 999px 0; }
+:root[data-style="kids"] .zbar { background: var(--zc, var(--hl)); border-radius: 999px; }
+:root[data-style="kids"] .zrow:not(.zhead):hover { background: var(--ground); border-radius: 8px; }
+:root[data-style="kids"] .split-legend .key, :root[data-style="kids"] .plan-legend .sw { border-radius: 50%; }
+:root[data-style="kids"] .plan-legend .sw { width: 12px; height: 12px; }
+:root[data-style="kids"] .dlabel .l1 { font-style: normal; font-weight: 700; font-size: 17px; letter-spacing: 0; }
+:root[data-style="kids"] .dlabel .l2 { font-family: var(--font-zh); font-weight: 400; letter-spacing: 0.2em; }
+:root[data-style="kids"] .dist { stroke-width: 2; }
+/* gentle lifts with the guidelines' playful easing */
+:root[data-style="kids"] .search button, :root[data-style="kids"] .btn-s, :root[data-style="kids"] .legend-dist, :root[data-style="kids"] .map-ctrl button {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s, border-color 0.2s, background-color 0.2s;
+}
+:root[data-style="kids"] .search button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 30%, transparent); }
+:root[data-style="kids"] .btn-s:hover, :root[data-style="kids"] .legend-dist:hover { transform: translateY(-2px); border-color: var(--leaf); }
+:root[data-style="kids"] .map-ctrl button:hover { transform: translateY(-1px); }
+/* sections fade in and up, one after another */
+:root[data-style="kids"] .mapframe, :root[data-style="kids"] .aside section { animation: fadeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) both; }
+:root[data-style="kids"] .aside section:nth-of-type(1) { animation-delay: 0.08s; }
+:root[data-style="kids"] .aside section:nth-of-type(2) { animation-delay: 0.16s; }
+:root[data-style="kids"] .aside section:nth-of-type(3) { animation-delay: 0.24s; }
+:root[data-style="kids"] .aside section:nth-of-type(4) { animation-delay: 0.32s; }
+:root[data-style="kids"] .aside section:nth-of-type(n + 5) { animation-delay: 0.4s; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes floatLeaf { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-6px) rotate(6deg); } }
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
 </style>
 <script>
+  // kids is the default style; the key is versioned so earlier Deck / Program choices start over on the new default
+  document.documentElement.dataset.style = "kids";
   try {
-    const t = localStorage.getItem("hyd2026-theme"), st = localStorage.getItem("hyd2026-style");
+    const t = localStorage.getItem("hyd2026-theme"), st = localStorage.getItem("hyd2026-style-v2");
     if (["light", "white", "dark"].includes(t)) document.documentElement.dataset.theme = t;
-    if (st === "program") document.documentElement.dataset.style = st;
-  } catch (err) { /* storage unavailable: follow the system setting */ }
+    if (["kids", "deck", "program"].includes(st)) document.documentElement.dataset.style = st;
+  } catch (err) { /* storage unavailable: default style, system tone */ }
 </script>
 
 <div class="app" lang="en">
   <header class="top">
     <div>
       <p class="eyebrow"><!--__EYEBROW__--></p>
-      <h1>Former Taichung City <i>Base Map</i><span class="zh" lang="zh-Hant-TW">原臺中市基本圖</span></h1>
+      <h1>Former Taichung City <i>Base Map</i><span class="zh" lang="zh-Hant-TW">原臺中市基本圖</span><span class="deco" aria-hidden="true"><i></i><i></i><i></i></span></h1>
     </div>
     <div class="top-r">
       <div class="switches">
         <div class="theme-switch" role="group" aria-label="Style">
+          <button type="button" data-style-set="kids" aria-pressed="false">Kids<span class="zh" lang="zh-Hant-TW">童趣</span></button>
           <button type="button" data-style-set="deck" aria-pressed="false">Deck<span class="zh" lang="zh-Hant-TW">簡報</span></button>
           <button type="button" data-style-set="program" aria-pressed="false">Program<span class="zh" lang="zh-Hant-TW">議程</span></button>
         </div>
@@ -1134,8 +1422,10 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
     const p = f.properties;
     const [lx, ly] = proj(p.label_lon, p.label_lat);
     // g: tint group, 0 = old downtown (five central districts), 1 = the outer districts of the former city
-    return { p, i, g: p.old_downtown ? 0 : 1, en: clean(p.district_en), zh: clean(p.district_zh), short: clean(p.district_en).replace(/\s*District$/i, ""),
-      d: geomPath(f.geometry), box: geomBox(f.geometry), lx, ly };
+    const short = clean(p.district_en).replace(/\s*District$/i, "");
+    // k: this district's colour token (--k-xitun, ...), defined only by the kids style
+    return { p, i, g: p.old_downtown ? 0 : 1, en: clean(p.district_en), zh: clean(p.district_zh), short,
+      k: `var(--k-${short.toLowerCase().replace(/[^a-z]+/g, "-")})`, d: geomPath(f.geometry), box: geomBox(f.geometry), lx, ly };
   });
   const distByCode = new Map(districts.map((d) => [d.p.district_code, d]));
   const villages = DATA.villages.features.map((f) => {
@@ -1196,6 +1486,7 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
 
   for (const v of villages) {
     v.el = svgEl("path", { d: v.d, class: "vil d" + v.dist.g + (v.approx ? " approx" : "") }, gV);
+    v.el.style.setProperty("--k", v.dist.k);
     v.el.__v = v;
   }
   for (const d of districts) svgEl("path", { d: d.d, class: "dist" }, gD);
@@ -1725,7 +2016,7 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
       const d = v.dist;
       card.innerHTML = `
         <div class="sel-head">
-          <span class="swatch d${d.g}" aria-hidden="true"></span>
+          <span class="swatch d${d.g}" style="--k: ${d.k}" aria-hidden="true"></span>
           <div><h3>${esc(v.en)}</h3>${zh(v.zh, "zh block")}</div>
           <button type="button" class="clear" id="sel-clear">Clear</button>
         </div>
@@ -1770,7 +2061,7 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
     const li = document.createElement("li");
     li.innerHTML = `
       <button type="button" class="legend-dist" aria-label="Zoom to ${esc(d.en)}">
-        <span class="swatch d${d.g}" aria-hidden="true"></span>
+        <span class="swatch d${d.g}" style="--k: ${d.k}" aria-hidden="true"></span>
         <span><span class="nm">${esc(d.en)}</span>${zh(d.zh)}</span>
         <span class="meta num">${fmt(d.p.area_km2)} km² · ${d.p.village_count} vil.</span>
       </button>`;
@@ -2090,13 +2381,14 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
     <li><span class="key" style="background:var(--hl)"></span><span>Land-use zones</span>${zh("土地使用分區")}<span class="v num">${fmt(subtotal.ha)} ha · ${fmt(subtotal.pct)}%</span></li>
     <li><span class="key" style="background:var(--neutral-fill)"></span><span>${esc(cap(pub.en))}</span>${zh(pub.zh)}<span class="v num">${fmt(pub.ha)} ha · ${fmt(pub.pct)}%</span></li>`;
   const maxHa = Math.max(...zones.map((z) => z.ha));
+  const zoneColour = new Map(Object.values(PLAN.classes).map((c) => [c.zh, c.swatch]));
   const zbars = $("#zbars");
   zbars.innerHTML =
     `<div class="zrow zhead" role="row"><span role="columnheader">Zone</span><span role="columnheader" aria-label="Area bar"></span><span class="r" role="columnheader">ha</span><span class="r" role="columnheader">Share</span></div>` +
     zones.map((z, i) => `
       <div class="zrow" role="row" data-i="${i}">
         <span class="zname" role="cell">${esc(cap(z.en))}${zh(z.zh, "zh block")}</span>
-        <span class="ztrack" role="cell" aria-hidden="true"><span class="zbar" style="width:${(z.ha / maxHa) * 100}%"></span></span>
+        <span class="ztrack" role="cell" aria-hidden="true"><span class="zbar" style="width:${(z.ha / maxHa) * 100}%${zoneColour.has(z.zh) ? `; --zc: ${esc(zoneColour.get(z.zh))}` : ""}"></span></span>
         <span class="r num" role="cell">${fmt(z.ha)}</span>
         <span class="r num" role="cell">${fmt(z.pct)}%</span>
       </div>`).join("");
@@ -2223,7 +2515,7 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
     ...(BASEMAP ? [`Basemap: vector tiles from <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> (© <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a>, data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors), drawn with MapLibre GL JS. Labels show the English name (OSM name:en) where one is mapped, otherwise the local name. If the vector map cannot start, the standard OpenStreetMap tiles are used instead (labels in the local language), under the OSMF <a href="https://operations.osmfoundation.org/policies/tiles/" target="_blank" rel="noopener">tile usage policy</a>.`] : []),
   ].map((t) => `<li>${t}</li>`).join("");
 
-  // ---------- style (Deck / Program) and tone (Light / White / Dark) ----------
+  // ---------- style (Kids / Deck / Program) and tone (Light / White / Dark) ----------
   // Both choices are stored per browser and shared with the landing page; without a tone the system setting decides.
   const root = document.documentElement;
   const sysDark = window.matchMedia("(prefers-color-scheme: dark)");
@@ -2233,7 +2525,7 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
   const syncTheme = () => {
     const t = root.dataset.theme || (sysDark.matches ? "dark" : "light");
     for (const b of themeBtns) b.setAttribute("aria-pressed", String(b.dataset.themeSet === t));
-    const st = root.dataset.style || "deck";
+    const st = root.dataset.style || "kids";
     for (const b of styleBtns) b.setAttribute("aria-pressed", String(b.dataset.styleSet === st));
   };
   for (const b of themeBtns) b.addEventListener("click", () => {
@@ -2242,8 +2534,8 @@ h3.mini .zh { text-transform: none; letter-spacing: 0.02em; }
     syncTheme();
   });
   for (const b of styleBtns) b.addEventListener("click", () => {
-    if (b.dataset.styleSet === "deck") delete root.dataset.style; else root.dataset.style = b.dataset.styleSet;
-    store("hyd2026-style", b.dataset.styleSet);
+    root.dataset.style = b.dataset.styleSet;
+    store("hyd2026-style-v2", b.dataset.styleSet);
     syncTheme();
     readDistChar();
     draw(); // district labels change width with the typeface
